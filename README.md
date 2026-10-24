@@ -41,6 +41,8 @@ Open port 3000 in your browser. Alternatively run `python3 -m http.server 3000` 
 
 - **Desert Dino Dash:** an original dinosaur endless runner inspired by the browser offline game. Dot runs automatically; jump cacti with Space/Up/W or tap the picture, and hold Down/S or the touch Duck button for low-flying birds. Obstacles speed up, the scenery changes between day and evening, and the best score is stored on this device. One collision ends the run. P pauses; switching tabs also pauses.
 
+- **Ruby’s Carrot Quest:** an original side-scrolling bunny platformer across Daisy Meadow, Apple Orchard, and Moonflower Hill. Carrots power Ruby up, improve jump height, and absorb one enemy hit. Collect sunseeds, hop onto snails from above, cross ponds, and reach each cottage. A midpoint flag saves the checkpoint for that garden. Left/Right or A/D moves; Space/Up/W jumps. Touch directions and Jump work together; P pauses. Three lives, visible garden-completion screens, and a final picnic victory.
+
 ## Test
 
 With Node.js 18 or newer, run `npm test` to check game rules. The site is static and can be deployed on any static host. Google Fonts is optional; system font fallbacks work offline. No accounts, API keys, or backend services are required to play. Optional Umami analytics needs a separately configured owner account.

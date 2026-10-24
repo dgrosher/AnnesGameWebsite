@@ -1,3 +1,4 @@
+import {mountBunny} from './bunny-game.js';
 import {mountRunner} from './runner-game.js';
 import {analyticsConfig} from './analytics-config.js';
 import {createAnalytics} from './analytics.js';
@@ -20,6 +21,7 @@ analytics.page('', 'Anne’s Arcade');
 let current = null;
 let cleanup = () => {};
 const games = {
+  bunny: ['Ruby’s Carrot Quest', 'A bunny-sized platform adventure with carrot-powered hops.', startBunny],
   runner: ['Desert Dino Dash', 'Tiny feet, big hops, and a desert full of surprises.', startRunner],
   rally: ['Sunseed Rally', 'A garden grand prix with friendly racers and a sunny finish.', startRally],
   clash: ['Cloudtop Clash', 'Double jumps, playful wind gusts, and a friendly platform showdown.', startClash],
@@ -279,3 +281,6 @@ container.addEventListener('party-restart',()=>{if(current==='rally'||current===
 
 function startRunner(){cleanup=mountRunner(container,status);}
 container.addEventListener('runner-restart',()=>{if(current==='runner')openGame(current);});
+
+function startBunny(){cleanup=mountBunny(container,status);}
+container.addEventListener('bunny-restart',()=>{if(current==='bunny')openGame(current);});
