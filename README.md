@@ -39,6 +39,8 @@ Open port 3000 in your browser. Alternatively run `python3 -m http.server 3000` 
 - **Sunseed Rally:** an original garden kart race against three computer rivals. Choose Finn, Ruby, Mina, or Bea; complete three laps. Up/W accelerates, Left/Right or A/D changes lanes, Space boosts, Down/S brakes. The kart follows the bends automatically. Collect seeds to recharge boost; dodge mud and rival karts. Includes a countdown, live placing, and finish position.
 - **Cloudtop Clash:** an original platform brawler against Zephyr. Move with Left/Right or A/D, press Up/W to jump and again to double-jump, Space sends a gust, and Down/S guards. Hits increase damage and knockback; leaving the arena costs a life. Last fighter with lives wins. Choose Finn, Ruby, Mina, or Bea. Both games have original artwork and characters, touch controls, pause/resume, automatic tab-away pause, and restart.
 
+- **Desert Dino Dash:** an original dinosaur endless runner inspired by the browser offline game. Dot runs automatically; jump cacti with Space/Up/W or tap the picture, and hold Down/S or the touch Duck button for low-flying birds. Obstacles speed up, the scenery changes between day and evening, and the best score is stored on this device. One collision ends the run. P pauses; switching tabs also pauses.
+
 ## Test
 
 With Node.js 18 or newer, run `npm test` to check game rules. The site is static and can be deployed on any static host. Google Fonts is optional; system font fallbacks work offline. No accounts, API keys, or backend services are required to play. Optional Umami analytics needs a separately configured owner account.

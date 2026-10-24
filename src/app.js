@@ -1,3 +1,4 @@
+import {mountRunner} from './runner-game.js';
 import {analyticsConfig} from './analytics-config.js';
 import {createAnalytics} from './analytics.js';
 import {mountPartyGame} from './party-games.js';
@@ -19,6 +20,7 @@ analytics.page('', 'Anne’s Arcade');
 let current = null;
 let cleanup = () => {};
 const games = {
+  runner: ['Desert Dino Dash', 'Tiny feet, big hops, and a desert full of surprises.', startRunner],
   rally: ['Sunseed Rally', 'A garden grand prix with friendly racers and a sunny finish.', startRally],
   clash: ['Cloudtop Clash', 'Double jumps, playful wind gusts, and a friendly platform showdown.', startClash],
   gofish: ['Ami’s Animal Go Fish', 'A is for Alligator! Find 26 animal pairs and explore the alphabet.', startGoFish],
@@ -274,3 +276,6 @@ function startGoFish(){cleanup=mountGoFish(container,status);}
 function startRally(){cleanup=mountPartyGame(container,status,'rally');}
 function startClash(){cleanup=mountPartyGame(container,status,'clash');}
 container.addEventListener('party-restart',()=>{if(current==='rally'||current==='clash')openGame(current);});
+
+function startRunner(){cleanup=mountRunner(container,status);}
+container.addEventListener('runner-restart',()=>{if(current==='runner')openGame(current);});
