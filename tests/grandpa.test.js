@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {newCloudwing,stepCloudwing,newGarden,stepGarden} from '../src/grandpa-logic.js';
+import {newCloudwing,stepCloudwing,newGarden,stepGarden,advanceGarden} from '../src/grandpa-logic.js';
 const idle={left:false,right:false,up:false,down:false,action:false};
 test('moonwing flaps, wraps at sky edges, and lands on cloud platforms',()=>{
  const s=newCloudwing();s.player.vy=80;stepCloudwing(s,{...idle,action:true},.03);assert.ok(s.player.vy<0);
@@ -30,6 +30,21 @@ test('three directional dew bursts turn a bug into a flower, with line-of-sight 
 });
 test('garden collision costs hearts, and clearing bugs grows a new garden',()=>{
  const s=newGarden();s.shield=0;s.player={x:10,y:4,dx:1,dy:0};s.bugs=[{x:10,y:4,puff:0,fade:0,move:10}];stepGarden(s,idle,.01);assert.equal(s.lives,2);assert.equal(s.player.y,1);
- s.bugs[0].puff=3;stepGarden(s,idle,.01);assert.equal(s.wave,2);assert.equal(s.score,100);assert.equal(s.bugs.length,5);
+ s.bugs[0].puff=3;stepGarden(s,idle,.01);assert.equal(s.cleared,true);assert.equal(s.wave,1);assert.equal(s.flowers.length,1);stepGarden(s,idle,.03);assert.equal(s.flowers.length,1);advanceGarden(s);assert.equal(s.wave,2);assert.equal(s.cleared,false);assert.equal(s.score,100);assert.equal(s.bugs.length,5);
  s.lives=1;s.shield=0;s.bugs=[{x:10,y:1,puff:0,fade:0,move:10}];stepGarden(s,idle,.01);assert.equal(s.over,true);
+});
+
+test('separate sprinkler taps keep progress even after long pauses',()=>{
+ const s=newGarden();s.player={x:10,y:4,dx:1,dy:0};s.bugs=[{x:12,y:4,puff:0,fade:0,move:100}];
+ for(let tap=1;tap<=3;tap++){
+  stepGarden(s,{...idle,action:true},1/60);
+  if(tap<3){for(let frame=0;frame<300;frame++)stepGarden(s,idle,1/60);assert.equal(s.bugs[0].puff,tap);}
+ }
+ assert.equal(s.flowers.length,1);assert.equal(s.bugs.length,0);assert.equal(s.cleared,true);assert.equal(s.score,100);
+ for(let frame=0;frame<600;frame++)stepGarden(s,idle,1/60);assert.equal(s.flowers.length,1);assert.equal(s.wave,1);
+});
+test('holding sprinkle transforms a bug through real frame timing without resetting cooldowns',()=>{
+ const s=newGarden();s.player={x:10,y:4,dx:1,dy:0};s.bugs=[{x:12,y:4,puff:0,fade:0,move:100}];
+ for(let frame=0;frame<60;frame++)stepGarden(s,{...idle,action:true},1/60);
+ assert.equal(s.cleared,true);assert.equal(s.flowers.length,1);assert.equal(s.score,100);
 });

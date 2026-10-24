@@ -21,18 +21,19 @@ export function stepCloudwing(s,input,dt){
 }
 export const GARDEN_COLS=20,GARDEN_ROWS=14;
 const cellKey=(x,y)=>`${x},${y}`;
-function gardenWave(s){s.wave++;s.dug=new Set();s.player={x:10,y:1,dx:0,dy:1};for(let y=1;y<13;y++)s.dug.add(cellKey(10,y));for(const y of [4,8,11])for(let x=2;x<18;x++)s.dug.add(cellKey(x,y));s.bugs=Array.from({length:Math.min(3+s.wave,8)},(_,i)=>({x:i%2?16-Math.floor(i/6)*2:3+Math.floor(i/6)*2,y:[4,8,11][i%3],puff:0,fade:0,move:.5+i*.1}));s.flowers=[];s.move=0;s.water=0;s.shield=2;}
+function gardenWave(s){s.wave++;s.dug=new Set();s.player={x:10,y:1,dx:0,dy:1};for(let y=1;y<13;y++)s.dug.add(cellKey(10,y));for(const y of [4,8,11])for(let x=2;x<18;x++)s.dug.add(cellKey(x,y));s.bugs=Array.from({length:Math.min(3+s.wave,8)},(_,i)=>({x:i%2?16-Math.floor(i/6)*2:3+Math.floor(i/6)*2,y:[4,8,11][i%3],puff:0,fade:0,move:.5+i*.1}));s.flowers=[];s.move=0;s.water=0;s.spray=0;s.shield=2;s.cleared=false;}
 export function newGarden(){const s={player:null,dug:new Set(),bugs:[],flowers:[],wave:0,score:0,lives:3,move:0,water:0,shield:0,spray:0,over:false};gardenWave(s);return s;}
+export function advanceGarden(s){if(s.cleared&&!s.over)gardenWave(s);}
 export function stepGarden(s,input,dt){
- if(s.over)return;s.shield=Math.max(0,s.shield-dt);s.move=Math.max(0,s.move-dt);s.water=Math.max(0,s.water-dt);s.spray=Math.max(0,s.spray-dt);
+ if(s.over||s.cleared)return;s.shield=Math.max(0,s.shield-dt);s.move=Math.max(0,s.move-dt);s.water=Math.max(0,s.water-dt);s.spray=Math.max(0,s.spray-dt);
  const p=s.player;const direction=input.left?[-1,0]:input.right?[1,0]:input.up?[0,-1]:input.down?[0,1]:null;
  if(direction){[p.dx,p.dy]=direction;if(s.move===0){p.x=clamp(p.x+p.dx,0,19);p.y=clamp(p.y+p.dy,1,13);s.dug.add(cellKey(p.x,p.y));s.move=.13;}}
  if(input.action&&s.water===0){s.water=.28;s.spray=.18;for(const bug of s.bugs){const dx=bug.x-p.x,dy=bug.y-p.y;const distance=dx*p.dx+dy*p.dy;const aligned=p.dx?dy===0:dx===0;let clear=true;for(let i=1;i<=distance;i++)if(!s.dug.has(cellKey(p.x+p.dx*i,p.y+p.dy*i)))clear=false;if(aligned&&distance>=0&&distance<=3&&clear){bug.puff++;bug.fade=1.6;}}}
  for(const bug of s.bugs){
   if(bug.puff>=3){s.flowers.push({x:bug.x,y:bug.y});s.score+=100;continue;}
-  bug.fade=Math.max(0,bug.fade-dt);if(!bug.fade&&bug.puff){bug.puff--;bug.fade=.7;}
-  if(!bug.puff){bug.move-=dt;if(bug.move<=0){bug.move=Math.max(.23,.6-s.wave*.025);const options=[[0,1],[0,-1],[1,0],[-1,0]].map(([dx,dy])=>({x:bug.x+dx,y:bug.y+dy})).filter(pos=>s.dug.has(cellKey(pos.x,pos.y)));options.sort((a,b)=>Math.abs(a.x-p.x)+Math.abs(a.y-p.y)-Math.abs(b.x-p.x)-Math.abs(b.y-p.y));if(options.length){bug.x=options[0].x;bug.y=options[0].y;}}}
-  if(bug.x===p.x&&bug.y===p.y&&!s.shield){s.lives--;s.shield=2;s.player={x:10,y:1,dx:0,dy:1};if(!s.lives)s.over=true;}
+  bug.fade=Math.max(0,bug.fade-dt);
+  if(!bug.fade){bug.move-=dt;if(bug.move<=0){bug.move=Math.max(.23,.6-s.wave*.025);const options=[[0,1],[0,-1],[1,0],[-1,0]].map(([dx,dy])=>({x:bug.x+dx,y:bug.y+dy})).filter(pos=>s.dug.has(cellKey(pos.x,pos.y)));options.sort((a,b)=>Math.abs(a.x-p.x)+Math.abs(a.y-p.y)-Math.abs(b.x-p.x)-Math.abs(b.y-p.y));if(options.length){bug.x=options[0].x;bug.y=options[0].y;}}}
+  if(bug.x===p.x&&bug.y===p.y&&!s.shield&&!bug.fade){s.lives--;s.shield=2;s.player={x:10,y:1,dx:0,dy:1};if(!s.lives)s.over=true;}
  }
- s.bugs=s.bugs.filter(b=>b.puff<3);if(!s.over&&!s.bugs.length)gardenWave(s);
+ s.bugs=s.bugs.filter(b=>b.puff<3);if(!s.over&&!s.bugs.length)s.cleared=true;
 }
