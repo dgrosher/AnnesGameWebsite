@@ -1,3 +1,4 @@
+import {mountFrogStory} from './frog-story.js';
 import {DRAW_TWO, newAnneGame, canPlayAnne, anneMove} from './annes-game.js';
 import {isSet, findSet, makeSetDeck, makeUnoDeck, canPlayUno, unoColorAfterPlay, shuffle, storyNodes} from './more-logic.js';
 import {shuffledPairs, snakeStep} from './logic.js';
@@ -8,6 +9,7 @@ const status = document.querySelector('#game-status');
 let current = null;
 let cleanup = () => {};
 const games = {
+  frog: ['Finn’s Treehouse', 'A read-aloud picture story about tacos, teamwork, and friends who care.', startFrog],
   anne: ['Anne’s Game', 'Match the number, play a wild, and race to an empty hand!', startAnne],
   uno: ['UNO', 'A friendly two-player game against the computer.', startUno],
   set: ['Set Match', 'Find three cards: each feature must be all the same or all different.', startSet],
@@ -231,3 +233,5 @@ function startAnne() {
   }
   render();cleanup=()=>clearTimeout(timeout);
 }
+
+function startFrog() {cleanup=mountFrogStory(container,status);}
