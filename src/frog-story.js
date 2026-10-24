@@ -1,3 +1,4 @@
+import {englishVoices, chooseNarrator, loadNarrationPreferences, saveNarrationPreferences} from './narration.js';
 export const frogPages = [
   {text:'Finn the Frog dreamed of a treehouse beside the pond.', scene:'dream', alt:'Finn the green frog looks up at a big oak tree beside a blue pond.', find:[510,100]},
   {text:'His friends Ruby Rabbit and Bea Bear came to help him build it.', scene:'friends', alt:'Ruby Rabbit and Bea Bear join Finn beneath the tree with a basket of supplies.', find:[95,100]},
@@ -43,13 +44,14 @@ export function frogPicture(page) {
 }
 export function mountFrogStory(container,status) {
  let index=0;let all=false;let active=false;let disposed=false;let token=0;let timer;let found=new Set();let collected=false;
+ const preferences=loadNarrationPreferences();
  const synth=globalThis.speechSynthesis;const supported=!!synth&&typeof globalThis.SpeechSynthesisUtterance==='function';
  function stop(){token++;clearTimeout(timer);if(active)synth?.cancel();active=false;}
  function speak(){
-  stop();if(!supported)return;const id=token;const utterance=new SpeechSynthesisUtterance(frogPages[index].text);utterance.lang='en-US';utterance.rate=.82;
-  const voices=synth.getVoices();const voice=voices.find(v=>v.lang.startsWith('en')&&v.localService)||voices.find(v=>v.lang.startsWith('en'));if(voice)utterance.voice=voice;
+  stop();if(!supported)return;const id=token;const utterance=new SpeechSynthesisUtterance(frogPages[index].text);utterance.lang='en-US';utterance.rate=preferences.rate;
+  const voice=chooseNarrator(synth.getVoices(),preferences.voice);if(voice){utterance.voice=voice;utterance.lang=voice.lang;}
   active=true;render();
-  utterance.onend=()=>{if(disposed||id!==token)return;active=false;if(all&&index<frogPages.length-1)timer=setTimeout(()=>{if(disposed||id!==token)return;index++;render();speak();},900);else{all=false;render();}};
+  utterance.onend=()=>{if(disposed||id!==token)return;active=false;if(all&&index<frogPages.length-1)timer=setTimeout(()=>{if(disposed||id!==token)return;index++;render();speak();},650);else{all=false;render();}};
   utterance.onerror=event=>{if(disposed||id!==token)return;active=false;all=false;render();if(!['canceled','interrupted'].includes(event.error))container.querySelector('.speech-note').textContent='Your browser could not play the voice; you can still read and explore every picture.';};
   synth.speak(utterance);
  }
@@ -63,10 +65,24 @@ export function mountFrogStory(container,status) {
   const controls=document.createElement('div');controls.className='frog-controls';
   function button(label,handler,disabled=false){const b=document.createElement('button');b.className='small-button';b.textContent=label;b.disabled=disabled;b.addEventListener('click',handler);return b;}
   controls.append(button('← Back',()=>go(index-1),index===0),button(active?'Stop reading':'Read to me',()=>{if(active){stop();all=false;render();}else{all=false;speak();}},!supported),button(all?'Stop story':'Read whole story',()=>{if(all){all=false;stop();render();}else{all=true;speak();}},!supported),button(index===frogPages.length-1?'Read again ↻':'Next →',()=>go(index===frogPages.length-1?0:index+1)));
-  const note=document.createElement('p');note.className='speech-note';note.textContent=supported?'Choose “Read to me” for this page, or “Read whole story” to turn pages automatically.':'Read-aloud isn’t available in this browser; every page is still here to read together.';
+  const settings=document.createElement('div');settings.className='narration-settings';
+  if(supported){
+   const voiceLabel=document.createElement('label');voiceLabel.textContent='Storyteller';const select=document.createElement('select');select.setAttribute('aria-label','Storyteller voice');
+   const automatic=document.createElement('option');automatic.value='';automatic.textContent='Automatic · best available';select.append(automatic);
+   for(const voice of englishVoices(synth.getVoices())){const option=document.createElement('option');option.value=voice.voiceURI;option.textContent=`${voice.name} (${voice.lang})`;select.append(option);}
+   select.value=[...select.options].some(o=>o.value===preferences.voice)?preferences.voice:'';
+   function updatePreference(){saveNarrationPreferences(preferences);if(active){speak();}else render();}
+   select.addEventListener('change',()=>{preferences.voice=select.value;updatePreference();});voiceLabel.append(select);
+   const paceLabel=document.createElement('label');paceLabel.textContent='Reading pace';const pace=document.createElement('select');pace.setAttribute('aria-label','Reading pace');
+   for(const [value,label] of [[.85,'Gentle'],[.96,'Natural'],[1.05,'Lively']]){const option=document.createElement('option');option.value=value;option.textContent=label;pace.append(option);}pace.value=preferences.rate;
+   pace.addEventListener('change',()=>{preferences.rate=Number(pace.value);updatePreference();});paceLabel.append(pace);settings.append(voiceLabel,paceLabel);
+  }
+  const note=document.createElement('p');note.className='speech-note';note.textContent=supported?'Try a different storyteller to find your favorite; voice quality depends on your device, and some voices need internet. “Read whole story” turns pages automatically.':'Read-aloud isn’t available in this browser; every page is still here to read together.';
   const hunt=document.createElement('p');hunt.className='frog-hunt';hunt.setAttribute('role','status');hunt.textContent=found.size===frogPages.length?'You found every firefly! A whole sky of friendship stars.':collected&&found.has(index)?'You found this page’s firefly!':'Picture game: find and tap the little glowing firefly on each page.';collected=false;
-  container.append(figure,sentence,controls,note,hunt);
+  container.append(figure,sentence,controls,settings,note,hunt);
   if(index===frogPages.length-1){const end=document.createElement('p');end.className='story-ending';end.textContent='The end · Good friends help us build, heal, and try again.';container.append(end);}
  }
- render();return ()=>{disposed=true;all=false;stop();};
+ function voicesChanged(){if(!disposed)render();}
+ if(supported)synth.addEventListener('voiceschanged',voicesChanged);
+ render();return ()=>{disposed=true;all=false;stop();if(supported)synth.removeEventListener('voiceschanged',voicesChanged);};
 }
