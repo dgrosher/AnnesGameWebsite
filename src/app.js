@@ -1,3 +1,4 @@
+import {mountFoxGame} from './fox-game.js';
 import {mountArcade} from './arcade-games.js';
 import {mountFrogStory} from './frog-story.js';
 import {DRAW_TWO, newAnneGame, canPlayAnne, anneMove} from './annes-game.js';
@@ -10,6 +11,7 @@ const status = document.querySelector('#game-status');
 let current = null;
 let cleanup = () => {};
 const games = {
+  fox: ['Fox & Found', 'A cooperative pie-thief mystery for one to four detectives on one screen.', startFox],
   invaders: ['Space Invaders', 'A tiny ship, a big galaxy, and a whole lot of invaders.', startInvaders],
   pong: ['Pong', 'You versus the computer. First to seven takes the match!', startPong],
   frog: ['Finn’s Treehouse', 'A read-aloud picture story about tacos, teamwork, and friends who care.', startFrog],
@@ -242,3 +244,5 @@ function startFrog() {cleanup=mountFrogStory(container,status);}
 function startInvaders(){cleanup=mountArcade(container,status,'invaders');}
 function startPong(){cleanup=mountArcade(container,status,'pong');}
 container.addEventListener('arcade-restart',()=>{if(current==='invaders'||current==='pong')openGame(current);});
+
+function startFox(){cleanup=mountFoxGame(container,status);}
