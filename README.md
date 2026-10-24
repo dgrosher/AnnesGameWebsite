@@ -29,6 +29,9 @@ Open port 3000 in your browser. Alternatively run `python3 -m http.server 3000` 
 
 - **Fox & Found:** an original cooperative deduction game for one to four detectives sharing one screen, inspired by cooperative fox mysteries. Choose clues or suspects, roll up to three times with matching dice automatically kept, and identify the pie thief before eight escape steps. All players win or lose together; accusations require confirmation. No online multiplayer or accounts.
 
+- **Cloudwing Couriers:** an original flying arcade adventure inspired by aerial jousting games. Pip rides a moonwing moth, meets cloud sprites from above, and collects the letters they release. Move with Left/Right or A/D; hold Space to flap. Three hearts, cloud platforms, and increasingly busy delivery routes.
+- **Root & Rumble:** an original digging arcade adventure. Mina Mole digs tunnels and sprinkles grumblebugs into flowers. Move with arrows/WASD; face a bug and hold Space for three dew bursts within three dug squares. Three hearts and progressively busier gardens. Both games have original canvas artwork, holdable touch controls, P to pause, and automatic pause when leaving the tab.
+
 ## Test
 
 With Node.js 18 or newer, run `npm test` to check game rules. The site is static and can be deployed on any static host. Google Fonts is optional; system font fallbacks work offline. No accounts, API keys, analytics, or backend services are required.

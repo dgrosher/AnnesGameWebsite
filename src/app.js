@@ -1,3 +1,4 @@
+import {mountGrandpaGame} from './grandpa-games.js';
 import {mountFoxGame} from './fox-game.js';
 import {mountArcade} from './arcade-games.js';
 import {mountFrogStory} from './frog-story.js';
@@ -11,6 +12,8 @@ const status = document.querySelector('#game-status');
 let current = null;
 let cleanup = () => {};
 const games = {
+  cloudwing: ['Cloudwing Couriers', 'A sky-post adventure with Pip and a very brave moonwing moth.', startCloudwing],
+  garden: ['Root & Rumble', 'Help Mina Mole turn underground grumbles into a blooming garden.', startGarden],
   fox: ['Fox & Found', 'A cooperative pie-thief mystery for one to four detectives on one screen.', startFox],
   invaders: ['Space Invaders', 'A tiny ship, a big galaxy, and a whole lot of invaders.', startInvaders],
   pong: ['Pong', 'You versus the computer. First to seven takes the match!', startPong],
@@ -246,3 +249,7 @@ function startPong(){cleanup=mountArcade(container,status,'pong');}
 container.addEventListener('arcade-restart',()=>{if(current==='invaders'||current==='pong')openGame(current);});
 
 function startFox(){cleanup=mountFoxGame(container,status);}
+
+function startCloudwing(){cleanup=mountGrandpaGame(container,status,'cloudwing');}
+function startGarden(){cleanup=mountGrandpaGame(container,status,'garden');}
+container.addEventListener('original-restart',()=>{if(current==='cloudwing'||current==='garden')openGame(current);});
