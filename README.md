@@ -41,4 +41,17 @@ Open port 3000 in your browser. Alternatively run `python3 -m http.server 3000` 
 
 ## Test
 
-With Node.js 18 or newer, run `npm test` to check game rules. The site is static and can be deployed on any static host. Google Fonts is optional; system font fallbacks work offline. No accounts, API keys, analytics, or backend services are required.
+With Node.js 18 or newer, run `npm test` to check game rules. The site is static and can be deployed on any static host. Google Fonts is optional; system font fallbacks work offline. No accounts, API keys, or backend services are required to play. Optional Umami analytics needs a separately configured owner account.
+
+
+## Optional shared analytics (Umami)
+
+Analytics is disabled until an owner connects a real Umami website. Local browser counters cannot report visitors across different devices; this integration sends events to your Umami dashboard once configured.
+
+1. In Umami Cloud or your existing self-hosted Umami installation, add the production website `https://dgrosher.github.io/AnnesGameWebsite/`.
+2. Copy the public website ID and tracking script URL into `src/analytics-config.js`, and set `enabled: true`. These are public identifiers, not API secrets. Do not commit account passwords or API tokens.
+3. Deploy the change, open the live website, launch a game, and check Umami’s realtime dashboard. Do not claim live collection until those visits appear.
+
+The **Visitors** report estimates unique visitors; it cannot count identified people or reliably combine one person’s different devices. In **Pages**, filter paths under `/AnnesGameWebsite/games/` for each game’s visits and visitor estimates. The `game_open` event includes `game_id` and `game_name` for popularity reports. `game_restart` is separate so restarting a round does not create another game-open event. Opening a game means entering its screen; this does not measure time actively playing, wins, or completions. A visitor who opens several games remains one site visitor, so do not sum per-game visitors to count people.
+
+The integration uses Umami’s cookie-free tracking; it does not add persistent player IDs or request player names or emails. Page URLs and referrers omit query strings and fragments. Localhost, Do Not Track, and Global Privacy Control visits are excluded. Ad blockers and disabled tracking can reduce counts. The site and all games work if analytics is unavailable. No analytics API credentials belong in the client code, and the private dashboard stays in your own Umami account.

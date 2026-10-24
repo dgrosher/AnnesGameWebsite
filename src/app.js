@@ -1,3 +1,5 @@
+import {analyticsConfig} from './analytics-config.js';
+import {createAnalytics} from './analytics.js';
 import {mountPartyGame} from './party-games.js';
 import {mountGoFish} from './gofish-game.js';
 import {mountJigsaw} from './jigsaw-game.js';
@@ -12,6 +14,8 @@ const home = document.querySelector('#home');
 const view = document.querySelector('#game-view');
 const container = document.querySelector('#game-container');
 const status = document.querySelector('#game-status');
+const analytics=createAnalytics(analyticsConfig);
+analytics.page('', 'Anne’s Arcade');
 let current = null;
 let cleanup = () => {};
 const games = {
@@ -33,16 +37,18 @@ const games = {
   snake: ['Snake', 'A tiny snake with a big appetite. How far can you grow?', startSnake]
 };
 function openGame(name) {
+  const restarting=current===name;
   cleanup(); cleanup = () => {};
   current = name; home.hidden = true; view.hidden = false;
   document.querySelector('#game-title').textContent = games[name][0];
   document.querySelector('#game-description').textContent = games[name][1];
   container.replaceChildren(); games[name][2]();
+  if(restarting)analytics.restart(name,games[name][0]);else analytics.game(name,games[name][0]);
   window.scrollTo({top: 0});
   document.querySelector('#back-button').focus({preventScroll: true});
 }
 document.querySelectorAll('[data-game]').forEach(button => button.addEventListener('click', () => openGame(button.dataset.game)));
-function goHome() { cleanup(); cleanup = () => {}; current = null; home.hidden = false; view.hidden = true; }
+function goHome() { if(current)analytics.page('', 'Anne’s Arcade');cleanup(); cleanup = () => {}; current = null; home.hidden = false; view.hidden = true; }
 document.querySelector('#back-button').addEventListener('click', () => { const previous = current; goHome(); document.querySelector(`[data-game="${previous}"]`).focus(); });
 document.querySelector('.brand').addEventListener('click', goHome);
 document.querySelector('#restart-button').addEventListener('click', () => {if (current) openGame(current);});
