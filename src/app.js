@@ -1,3 +1,4 @@
+import {mountPartyGame} from './party-games.js';
 import {mountGoFish} from './gofish-game.js';
 import {mountJigsaw} from './jigsaw-game.js';
 import {mountGrandpaGame} from './grandpa-games.js';
@@ -14,6 +15,8 @@ const status = document.querySelector('#game-status');
 let current = null;
 let cleanup = () => {};
 const games = {
+  rally: ['Sunseed Rally', 'A garden grand prix with friendly racers and a sunny finish.', startRally],
+  clash: ['Cloudtop Clash', 'Double jumps, playful wind gusts, and a friendly platform showdown.', startClash],
   gofish: ['Ami’s Animal Go Fish', 'A is for Alligator! Find 26 animal pairs and explore the alphabet.', startGoFish],
   jigsaw: ['Ami’s Garden Jigsaw', 'Fifty little pieces, one lovely garden, and all the time you need.', startJigsaw],
   cloudwing: ['Cloudwing Couriers', 'A sky-post adventure with Pip and a very brave moonwing moth.', startCloudwing],
@@ -261,3 +264,7 @@ container.addEventListener('original-restart',()=>{if(current==='cloudwing'||cur
 function startJigsaw(){cleanup=mountJigsaw(container,status);}
 
 function startGoFish(){cleanup=mountGoFish(container,status);}
+
+function startRally(){cleanup=mountPartyGame(container,status,'rally');}
+function startClash(){cleanup=mountPartyGame(container,status,'clash');}
+container.addEventListener('party-restart',()=>{if(current==='rally'||current==='clash')openGame(current);});

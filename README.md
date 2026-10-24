@@ -36,6 +36,9 @@ Open port 3000 in your browser. Alternatively run `python3 -m http.server 3000` 
 
 - **Ami’s Animal Go Fish:** a learning game against the computer with 52 illustrated cards: two of each of 26 A–Z animals. Choose a card to ask for its match, draw when told to go fish, and collect two-card pairs in the alphabet album. Seven-card opening hands; empty hands refill up to five while the pond has cards. Matching requests or fishing the requested card earn another turn. Most pairs wins after all 26 are found. Uppercase/lowercase letters, animal names, an explorable album, and optional browser narration support learning.
 
+- **Sunseed Rally:** an original garden kart race against three computer rivals. Choose Finn, Ruby, Mina, or Bea; complete three laps. Up/W accelerates, Left/Right or A/D changes lanes, Space boosts, Down/S brakes. The kart follows the bends automatically. Collect seeds to recharge boost; dodge mud and rival karts. Includes a countdown, live placing, and finish position.
+- **Cloudtop Clash:** an original platform brawler against Zephyr. Move with Left/Right or A/D, press Up/W to jump and again to double-jump, Space sends a gust, and Down/S guards. Hits increase damage and knockback; leaving the arena costs a life. Last fighter with lives wins. Choose Finn, Ruby, Mina, or Bea. Both games have original artwork and characters, touch controls, pause/resume, automatic tab-away pause, and restart.
+
 ## Test
 
 With Node.js 18 or newer, run `npm test` to check game rules. The site is static and can be deployed on any static host. Google Fonts is optional; system font fallbacks work offline. No accounts, API keys, analytics, or backend services are required.
