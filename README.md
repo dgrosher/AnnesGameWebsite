@@ -24,6 +24,9 @@ Open port 3000 in your browser. Alternatively run `python3 -m http.server 3000` 
 
 - **Finn’s Treehouse:** a 14-page illustrated read-aloud story and firefly-finding game. Each page has one sentence and its own picture. Read one page or the whole story with automatic page turns. Browser text-to-speech availability depends on the device and installed voices; reading and the picture game work without audio. No microphone is used.
 
+- **Space Invaders:** move with Left/Right or A/D and fire with Space. Hold the on-screen buttons on touch devices. Clear waves, score points, and protect your three lives.
+- **Pong:** play against the computer; first to seven wins. Move with Up/Down or W/S, hold touch buttons, or drag on the court. Both arcade games support P to pause and pause automatically when you switch tabs.
+
 ## Test
 
 With Node.js 18 or newer, run `npm test` to check game rules. The site is static and can be deployed on any static host. Google Fonts is optional; system font fallbacks work offline. No accounts, API keys, analytics, or backend services are required.
