@@ -1,3 +1,4 @@
+import {DRAW_TWO, newAnneGame, canPlayAnne, anneMove} from './annes-game.js';
 import {isSet, findSet, makeSetDeck, makeUnoDeck, canPlayUno, unoColorAfterPlay, shuffle, storyNodes} from './more-logic.js';
 import {shuffledPairs, snakeStep} from './logic.js';
 const home = document.querySelector('#home');
@@ -7,6 +8,7 @@ const status = document.querySelector('#game-status');
 let current = null;
 let cleanup = () => {};
 const games = {
+  anne: ['Anne’s Game', 'Match the number, play a wild, and race to an empty hand!', startAnne],
   uno: ['UNO', 'A friendly two-player game against the computer.', startUno],
   set: ['Set Match', 'Find three cards: each feature must be all the same or all different.', startSet],
   story: ['The Secret Garden', 'Your choices lead the way. An original little adventure.', startStory],
@@ -194,6 +196,38 @@ function startUno() {
     container.append(opponent,center,note,handLabel,hand,controls);
     if(choosing!==null){const picker=document.createElement('div');picker.className='color-picker';picker.setAttribute('role','group');picker.setAttribute('aria-label','Choose the wild card color');const label=document.createElement('p');label.textContent='Choose your color:';picker.append(label);for(const name of ['red','blue','green','yellow']){const b=document.createElement('button');b.className=`small-button uno-${name}`;b.textContent=name;b.addEventListener('click',()=>play(choosing,name));picker.append(b);}const cancel=document.createElement('button');cancel.className='small-button';cancel.textContent='Cancel';cancel.addEventListener('click',()=>{choosing=null;render();});picker.append(cancel);container.append(picker);}
     const rules=document.createElement('details');rules.className='uno-rules';const summary=document.createElement('summary');summary.textContent='How to play';const text=document.createElement('p');text.textContent='Match the active color or the top card’s value. Draw one if you cannot play; play that new card if it fits, or pass. Skip and Reverse give you another turn in this two-player game. +2 and +4 make the other player draw and miss a turn; no stacking. +4 is allowed only when you have no cards of the active color. Call UNO before playing down to one card, or draw two! The computer calls automatically. First empty hand wins. This casual version has no challenge rule or cumulative scoring.';rules.append(summary,text);container.append(rules);
+  }
+  render();cleanup=()=>clearTimeout(timeout);
+}
+
+function startAnne() {
+  let state=newAnneGame();let timeout;
+  function move(action) {state=anneMove(state,action);render();schedule();}
+  function schedule() {
+    clearTimeout(timeout);
+    if(state.turn===1&&state.winner===null) timeout=setTimeout(()=>{
+      const hand=state.hands[1];let index=hand.findIndex(card=>card!==DRAW_TWO&&canPlayAnne(card,state.required));
+      if(index<0)index=hand.findIndex(card=>canPlayAnne(card,state.required));
+      move(index<0?{type:'draw'}:{type:'play',index});
+    },1100);
+  }
+  function render() {
+    container.replaceChildren();status.textContent=state.winner!==null?'Round complete':state.turn===0?'Your turn':'Computer’s turn';
+    const opponent=document.createElement('div');opponent.className='uno-opponent';opponent.textContent=`Computer · ${state.hands[1].length} cards`;
+    const backs=document.createElement('div');backs.className='uno-backs';for(let i=0;i<Math.min(state.hands[1].length,15);i++){const b=document.createElement('span');b.textContent='a';backs.append(b);}opponent.append(backs);
+    const table=document.createElement('div');table.className='uno-center';
+    const last=state.discard.at(-1);const pile=document.createElement('div');pile.className='anne-card';pile.textContent=last===undefined?'✦':last;pile.setAttribute('aria-label',last===undefined?'No card played yet':`Last played: ${last===DRAW_TWO?'Draw 2':last}`);
+    const requirement=document.createElement('p');requirement.className='active-color';requirement.textContent=state.required===null?'Play any card':`Match ${state.required} or play Draw 2`;
+    table.append(pile,requirement);
+    const note=document.createElement('p');note.className='rules-note';note.setAttribute('role','status');note.textContent=state.message;
+    const label=document.createElement('h3');label.textContent=`Your hand · ${state.hands[0].length} cards`;
+    const hand=document.createElement('div');hand.className='uno-hand';state.hands[0].forEach((card,index)=>{
+      const b=document.createElement('button');b.className=`anne-card${card===DRAW_TWO?' anne-wild':''}`;b.textContent=card;b.setAttribute('aria-label',card===DRAW_TWO?'Play Draw 2':`Play ${card}`);
+      b.disabled=state.winner!==null||state.turn!==0||!canPlayAnne(card,state.required);b.addEventListener('click',()=>move({type:'play',index}));hand.append(b);
+    });
+    const draw=document.createElement('button');draw.className='small-button';draw.textContent='No match? Draw a card';draw.disabled=state.winner!==null||state.turn!==0||state.hands[0].some(card=>canPlayAnne(card,state.required));draw.addEventListener('click',()=>move({type:'draw'}));
+    const rules=document.createElement('details');rules.className='uno-rules';const summary=document.createElement('summary');summary.textContent='Anne’s rules';const text=document.createElement('p');text.textContent='The deck has four of each number 1–6 and six Draw 2 cards. Each player starts with five cards. The first player can play anything; after a number, the next player must match it or play a wild Draw 2. If you cannot play, draw one and end your turn. The next player can then play anything. Draw 2 is always playable: the next player draws two and misses their turn; you can then play anything. Draw 2 cards cannot be stacked. First empty hand wins immediately. Used cards are reshuffled when the draw pile runs out, keeping the top card on the table.';rules.append(summary,text);
+    container.append(opponent,table,note,label,hand,draw,rules);
   }
   render();cleanup=()=>clearTimeout(timeout);
 }
