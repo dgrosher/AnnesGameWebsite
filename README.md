@@ -34,6 +34,8 @@ Open port 3000 in your browser. Alternatively run `python3 -m http.server 3000` 
 
 - **Ami’s Garden Jigsaw:** exactly 50 interlocking pieces (10 × 5) of an original illustrated garden. Drag pieces or select a piece and tap its board square. Includes a picture preview, edge filter, paged tray, larger scrollable board, keyboard placement, and completion celebration. No timer or rotation.
 
+- **Ami’s Animal Go Fish:** a learning game against the computer with 52 illustrated cards: two of each of 26 A–Z animals. Choose a card to ask for its match, draw when told to go fish, and collect two-card pairs in the alphabet album. Seven-card opening hands; empty hands refill up to five while the pond has cards. Matching requests or fishing the requested card earn another turn. Most pairs wins after all 26 are found. Uppercase/lowercase letters, animal names, an explorable album, and optional browser narration support learning.
+
 ## Test
 
 With Node.js 18 or newer, run `npm test` to check game rules. The site is static and can be deployed on any static host. Google Fonts is optional; system font fallbacks work offline. No accounts, API keys, analytics, or backend services are required.

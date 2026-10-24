@@ -1,3 +1,4 @@
+import {mountGoFish} from './gofish-game.js';
 import {mountJigsaw} from './jigsaw-game.js';
 import {mountGrandpaGame} from './grandpa-games.js';
 import {mountFoxGame} from './fox-game.js';
@@ -13,6 +14,7 @@ const status = document.querySelector('#game-status');
 let current = null;
 let cleanup = () => {};
 const games = {
+  gofish: ['Ami’s Animal Go Fish', 'A is for Alligator! Find 26 animal pairs and explore the alphabet.', startGoFish],
   jigsaw: ['Ami’s Garden Jigsaw', 'Fifty little pieces, one lovely garden, and all the time you need.', startJigsaw],
   cloudwing: ['Cloudwing Couriers', 'A sky-post adventure with Pip and a very brave moonwing moth.', startCloudwing],
   garden: ['Root & Rumble', 'Help Mina Mole turn underground grumbles into a blooming garden.', startGarden],
@@ -257,3 +259,5 @@ function startGarden(){cleanup=mountGrandpaGame(container,status,'garden');}
 container.addEventListener('original-restart',()=>{if(current==='cloudwing'||current==='garden')openGame(current);});
 
 function startJigsaw(){cleanup=mountJigsaw(container,status);}
+
+function startGoFish(){cleanup=mountGoFish(container,status);}
