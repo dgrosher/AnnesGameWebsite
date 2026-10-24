@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {createAnalytics} from '../src/analytics.js';
+import {createAnalytics,analyticsDisabledReason} from '../src/analytics.js';
 const config={enabled:true,websiteId:'public-test-id',scriptUrl:'https://stats.example.com/script.js'};
 function environment(){const records=[],scripts=[];const env={location:{hostname:'dgrosher.github.io',pathname:'/AnnesGameWebsite/'},navigator:{},document:{referrer:'https://example.com/family?private=value#section',head:{append(script){scripts.push(script);}},createElement(){return {attributes:{},listeners:{},setAttribute(key,value){this.attributes[key]=value;},addEventListener(type,handler){this.listeners[type]=handler;}};}}};return {env,records,scripts,load(){env.umami={track(fn){records.push(fn({url:'/ignored?secret=value',referrer:'ignored'}));}};scripts[0].listeners.load();}};}
 test('analytics stays off without configuration and honors local testing and privacy signals',()=>{
@@ -21,4 +21,10 @@ test('blocked scripts, unavailable SDKs and throwing collectors do not break gam
 });
 test('index.html deployment paths resolve to the same report URLs',()=>{
  const e=environment();e.env.location.pathname='/AnnesGameWebsite/index.html';const a=createAnalytics(config,e.env);e.load();a.game('memory','Memory Match');assert.equal(e.records[0].url,'/AnnesGameWebsite/games/memory');
+});
+
+test('browser privacy and Umami opt-out settings have explicit diagnostic reasons',()=>{
+ const e=environment();assert.equal(analyticsDisabledReason(config,e.env),'');e.env.navigator.doNotTrack='yes';assert.match(analyticsDisabledReason(config,e.env),/Do Not Track/);e.env.navigator.doNotTrack=null;e.env.doNotTrack=1;assert.match(analyticsDisabledReason(config,e.env),/Do Not Track/);delete e.env.doNotTrack;
+ e.env.localStorage={getItem:()=> 'true'};assert.match(analyticsDisabledReason(config,e.env),/local settings/);const a=createAnalytics(config,e.env);a.game('uno','UNO');assert.equal(e.scripts.length,0);
+ e.env.localStorage={getItem(){throw new Error('Storage unavailable');}};assert.equal(analyticsDisabledReason(config,e.env),'');
 });
