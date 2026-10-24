@@ -17,3 +17,32 @@ export function loadNarrationPreferences() {
 export function saveNarrationPreferences(preferences) {
  try{localStorage.setItem(preferenceKey,JSON.stringify(preferences));}catch{/* Reading still works when storage is unavailable. */}
 }
+
+// Keep the utterance alive and recover when a network voice cannot start.
+export function createNarrationPlayer({synth,Utterance,startTimeout=5000}) {
+ let generation=0,currentUtterance=null,watchdog=null,retry=null;
+ function clear(){clearTimeout(watchdog);clearTimeout(retry);watchdog=null;retry=null;}
+ function stop(){generation++;clear();const busy=!!currentUtterance||synth.speaking||synth.pending;currentUtterance=null;if(busy)synth.cancel();}
+ function play(text,{voice=null,rate=.96,onStart=()=>{},onEnd=()=>{},onError=()=>{},onFallback=()=>{}}={}) {
+  stop();const session=generation;
+  const local=englishVoices(synth.getVoices()).filter(v=>v.localService&&v.voiceURI!==voice?.voiceURI).slice(0,1);
+  const candidates=voice?[voice,...local,null]:[...local,null];let index=0,attempt=0;
+  function run(){
+   if(session!==generation)return;const id=++attempt;const selected=candidates[index];let finished=false;
+   const utterance=new Utterance(text);currentUtterance=utterance;utterance.lang=selected?.lang||'en-US';utterance.rate=rate;utterance.volume=1;if(selected)utterance.voice=selected;
+   function valid(){return session===generation&&id===attempt&&!finished;}
+   function fail(error){
+    if(!valid())return;finished=true;clearTimeout(watchdog);watchdog=null;
+    if(index<candidates.length-1){index++;onFallback();retry=setTimeout(()=>{if(session!==generation)return;synth.cancel();run();},0);}
+    else{currentUtterance=null;synth.cancel();onError(error);}
+   }
+   utterance.onstart=()=>{if(!valid())return;clearTimeout(watchdog);watchdog=null;onStart();};
+   utterance.onend=()=>{if(!valid())return;finished=true;clearTimeout(watchdog);watchdog=null;currentUtterance=null;onEnd();};
+   utterance.onerror=event=>fail(event.error||'voice-unavailable');
+   watchdog=setTimeout(()=>fail('voice-did-not-start'),startTimeout);
+   try{if(synth.paused)synth.resume();synth.speak(utterance);}catch{fail('voice-unavailable');}
+  }
+  run();
+ }
+ return {play,stop,get utterance(){return currentUtterance;}};
+}

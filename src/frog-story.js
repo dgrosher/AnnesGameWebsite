@@ -1,4 +1,4 @@
-import {englishVoices, chooseNarrator, loadNarrationPreferences, saveNarrationPreferences} from './narration.js';
+import {createNarrationPlayer, englishVoices, chooseNarrator, loadNarrationPreferences, saveNarrationPreferences} from './narration.js';
 export const frogPages = [
   {text:'Finn the Frog dreamed of a treehouse beside the pond.', scene:'dream', alt:'Finn the green frog looks up at a big oak tree beside a blue pond.', find:[510,100]},
   {text:'His friends Ruby Rabbit and Bea Bear came to help him build it.', scene:'friends', alt:'Ruby Rabbit and Bea Bear join Finn beneath the tree with a basket of supplies.', find:[95,100]},
@@ -43,17 +43,23 @@ export function frogPicture(page) {
  return `<svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="600" height="360" rx="18" fill="${clinic?'#e8e2d1':'#dcebe2'}"/>${clinic?'<rect x="55" y="40" width="105" height="105" rx="8" fill="#f8f4e4"/><path d="M105 61V123M74 92H136" stroke="#b3c6af" stroke-width="18"/>':'<circle cx="80" cy="65" r="30" fill="#f0d58c"/><path d="M0 275Q140 220 300 275T600 265V360H0Z" fill="#b7cd96"/><ellipse cx="450" cy="332" rx="125" ry="20" fill="#9ec5ca"/>'+tree(hasHouse,scene==='ending')}<path d="M0 341Q200 325 600 344V360H0Z" fill="${clinic?'#c5c6ad':'#a6bd84'}"/>${art}</svg>`;
 }
 export function mountFrogStory(container,status) {
+ let speechMessage='';
  let index=0;let all=false;let active=false;let disposed=false;let token=0;let timer;let found=new Set();let collected=false;
  const preferences=loadNarrationPreferences();
  const synth=globalThis.speechSynthesis;const supported=!!synth&&typeof globalThis.SpeechSynthesisUtterance==='function';
- function stop(){token++;clearTimeout(timer);if(active)synth?.cancel();active=false;}
+ const narrator=supported?createNarrationPlayer({synth,Utterance:globalThis.SpeechSynthesisUtterance}):null;
+ function stop(){token++;clearTimeout(timer);narrator?.stop();active=false;speechMessage='';}
  function speak(){
-  stop();if(!supported)return;const id=token;const utterance=new SpeechSynthesisUtterance(frogPages[index].text);utterance.lang='en-US';utterance.rate=preferences.rate;
-  const voice=chooseNarrator(synth.getVoices(),preferences.voice);if(voice){utterance.voice=voice;utterance.lang=voice.lang;}
-  active=true;render();
-  utterance.onend=()=>{if(disposed||id!==token)return;active=false;if(all&&index<frogPages.length-1)timer=setTimeout(()=>{if(disposed||id!==token)return;index++;render();speak();},650);else{all=false;render();}};
-  utterance.onerror=event=>{if(disposed||id!==token)return;active=false;all=false;render();if(!['canceled','interrupted'].includes(event.error))container.querySelector('.speech-note').textContent='Your browser could not play the voice; you can still read and explore every picture.';};
-  synth.speak(utterance);
+  stop();if(!supported)return;const id=token;
+  const voice=chooseNarrator(synth.getVoices(),preferences.voice);
+  active=true;speechMessage='Starting the storyteller…';render();
+  narrator.play(frogPages[index].text,{
+   voice,rate:preferences.rate,
+   onStart:()=>{if(disposed||id!==token)return;speechMessage='Reading aloud…';render();},
+   onFallback:()=>{if(disposed||id!==token)return;speechMessage='Trying another voice on your device…';render();},
+   onEnd:()=>{if(disposed||id!==token)return;active=false;speechMessage='';if(all&&index<frogPages.length-1)timer=setTimeout(()=>{if(disposed||id!==token)return;index++;render();speak();},650);else{all=false;render();}},
+   onError:()=>{if(disposed||id!==token)return;active=false;all=false;speechMessage='The voice could not start. Check your device’s sound, then tap “Read to me” to retry. If you’re in an in-app browser, try opening the site in Safari or Chrome.';render();}
+  });
  }
  function go(next){stop();all=false;index=next;render();container.querySelector('.frog-sentence').focus({preventScroll:true});}
  function render(){
@@ -77,7 +83,7 @@ export function mountFrogStory(container,status) {
    for(const [value,label] of [[.85,'Gentle'],[.96,'Natural'],[1.05,'Lively']]){const option=document.createElement('option');option.value=value;option.textContent=label;pace.append(option);}pace.value=preferences.rate;
    pace.addEventListener('change',()=>{preferences.rate=Number(pace.value);updatePreference();});paceLabel.append(pace);settings.append(voiceLabel,paceLabel);
   }
-  const note=document.createElement('p');note.className='speech-note';note.textContent=supported?'Try a different storyteller to find your favorite; voice quality depends on your device, and some voices need internet. “Read whole story” turns pages automatically.':'Read-aloud isn’t available in this browser; every page is still here to read together.';
+  const note=document.createElement('p');note.className='speech-note';note.setAttribute('role','status');note.textContent=speechMessage||(supported?'Try a different storyteller to find your favorite; voice quality depends on your device, and some voices need internet. “Read whole story” turns pages automatically.':'Read-aloud isn’t available in this browser; every page is still here to read together.');
   const hunt=document.createElement('p');hunt.className='frog-hunt';hunt.setAttribute('role','status');hunt.textContent=found.size===frogPages.length?'You found every firefly! A whole sky of friendship stars.':collected&&found.has(index)?'You found this page’s firefly!':'Picture game: find and tap the little glowing firefly on each page.';collected=false;
   container.append(figure,sentence,controls,settings,note,hunt);
   if(index===frogPages.length-1){const end=document.createElement('p');end.className='story-ending';end.textContent='The end · Good friends help us build, heal, and try again.';container.append(end);}
