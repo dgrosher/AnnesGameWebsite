@@ -46,7 +46,7 @@ With Node.js 18 or newer, run `npm test` to check game rules. The site is static
 
 ## Optional shared analytics (Umami)
 
-Analytics is disabled until an owner connects a real Umami website. Local browser counters cannot report visitors across different devices; this integration sends events to your Umami dashboard once configured.
+Umami is configured for the owner-provided website ID in `src/analytics-config.js`. Tracking is enabled on production visits after this configuration is deployed. Local browser counters cannot report visitors across different devices; this integration sends events to your Umami dashboard once configured.
 
 1. In Umami Cloud or your existing self-hosted Umami installation, add the production website `https://dgrosher.github.io/AnnesGameWebsite/`.
 2. Copy the public website ID and tracking script URL into `src/analytics-config.js`, and set `enabled: true`. These are public identifiers, not API secrets. Do not commit account passwords or API tokens.
