@@ -32,6 +32,8 @@ Open port 3000 in your browser. Alternatively run `python3 -m http.server 3000` 
 - **Cloudwing Couriers:** an original flying arcade adventure inspired by aerial jousting games. Pip rides a moonwing moth, meets cloud sprites from above, and collects the letters they release. Move with Left/Right or A/D; hold Space to flap. Three hearts, cloud platforms, and increasingly busy delivery routes.
 - **Root & Rumble:** an original digging arcade adventure. Mina Mole digs tunnels and sprinkles grumblebugs into flowers. Move with arrows/WASD; face a bug and hold Space for three dew bursts within three dug squares. Three hearts and progressively busier gardens. Both games have original canvas artwork, holdable touch controls, P to pause, and automatic pause when leaving the tab.
 
+- **Ami’s Garden Jigsaw:** exactly 50 interlocking pieces (10 × 5) of an original illustrated garden. Drag pieces or select a piece and tap its board square. Includes a picture preview, edge filter, paged tray, larger scrollable board, keyboard placement, and completion celebration. No timer or rotation.
+
 ## Test
 
 With Node.js 18 or newer, run `npm test` to check game rules. The site is static and can be deployed on any static host. Google Fonts is optional; system font fallbacks work offline. No accounts, API keys, analytics, or backend services are required.
