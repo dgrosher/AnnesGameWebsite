@@ -21,6 +21,11 @@ export function makeUnoDeck() {
   for(let i=0;i<4;i++) {deck.push({color:'wild',value:'Wild'});deck.push({color:'wild',value:'+4'});}
   return shuffle(deck);
 }
+export function unoColorAfterPlay(card, chosenColor) {
+  if (card.color !== 'wild') return card.color;
+  if (!['red','blue','green','yellow'].includes(chosenColor)) throw new Error('Choose a valid color for a wild card.');
+  return chosenColor;
+}
 export function canPlayUno(card, top, activeColor, hand=[]) {
   if(card.value==='+4') return !hand.some(c=>c.color===activeColor);
   return card.color==='wild' || card.color===activeColor || card.value===top.value;

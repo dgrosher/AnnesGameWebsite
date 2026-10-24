@@ -1,4 +1,4 @@
-import {isSet, findSet, makeSetDeck, makeUnoDeck, canPlayUno, shuffle, storyNodes} from './more-logic.js';
+import {isSet, findSet, makeSetDeck, makeUnoDeck, canPlayUno, unoColorAfterPlay, shuffle, storyNodes} from './more-logic.js';
 import {shuffledPairs, snakeStep} from './logic.js';
 const home = document.querySelector('#home');
 const view = document.querySelector('#game-view');
@@ -162,7 +162,7 @@ function startUno() {
     const who=turn;const card=hands[who][index];
     if(!card||!canPlayUno(card,top(),color,hands[who]))return;
     if(who===0&&card.color==='wild'&&!newColor){choosing=index;render();return;}
-    hands[who].splice(index,1);discard.push(card);color=newColor||card.color;choosing=null;drawn=null;
+    color=unoColorAfterPlay(card,newColor);hands[who].splice(index,1);discard.push(card);choosing=null;drawn=null;
     if(who===0&&hands[0].length===1&&!called){drawMany(0,2);message='Oops! Call UNO before playing your second-to-last card. Draw two.';}
     else message=`${who===0?'You':'Computer'} played ${card.color==='wild'?newColor:card.color} ${card.value}.`;
     called=false;
@@ -176,7 +176,7 @@ function startUno() {
   function computer(){
     const hand=hands[1];let index=hand.findIndex(c=>canPlayUno(c,top(),color,hand));
     if(index<0){const c=drawCard();if(c){hand.push(c);if(canPlayUno(c,top(),color,hand))index=hand.length-1;}}
-    if(index>=0){const colors=['red','blue','green','yellow'];const chosen=colors.sort((a,b)=>hand.filter(c=>c.color===b).length-hand.filter(c=>c.color===a).length)[0];play(index,chosen);}
+    if(index>=0){const colors=['red','blue','green','yellow'];const chosen=hand[index].color==='wild'?colors.sort((a,b)=>hand.filter(c=>c.color===b).length-hand.filter(c=>c.color===a).length)[0]:undefined;play(index,chosen);}
     else{turn=0;message='Computer draws and passes. Your turn!';next();}
   }
   function render(){
