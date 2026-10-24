@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f5ef">
+  <title>Anne’s Arcade · A little room for big fun</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header"><a class="brand" href="#" aria-label="Anne’s Arcade home"><span class="brand-icon">a<span>✦</span></span>anne’s arcade<span class="brand-dot">.</span></a><span class="header-note">SMALL GAMES. BIG SMILES. <span>☺</span></span></header>
+  <main>
+    <section id="home">
+      <div class="hero"><div class="hero-copy"><span class="eyebrow"><span class="live-dot"></span> YOUR HAPPY LITTLE CORNER OF THE INTERNET</span><h1>A little break.<br>A lot of <span class="fun">fun<svg viewBox="0 0 200 20" aria-hidden="true"><path d="M4 14 Q90 -1 192 12"/></svg></span><span class="sparkle">✳</span></h1><p>Pick a game, find your groove, and let the good times roll.<br class="desktop-break"> No downloads. No sign-ups. Just play.</p><a class="primary-button" href="#games">Find your next favorite <span>↘</span></a><div class="hero-meta"><span>✧ Free to play</span><span>♡ Made for everyone</span></div></div><div class="hero-art" aria-hidden="true"><span class="art-star">✦</span><div class="art-orbit"></div><div class="tile tile-x">×</div><div class="tile tile-flower">✿</div><div class="tile tile-snake"><div class="pixel-snake"><i></i><i></i><i></i><i></i><i></i><i></i><b>··</b></div><span class="pixel-food">✦</span></div><span class="art-squiggle">〰</span><span class="art-caption">a little play goes a long way ↗</span></div></div>
+      <section class="games-section" id="games"><div class="section-heading"><div><span class="eyebrow">THE GOOD STUFF</span><h2>What are we playing?</h2></div><span class="game-count">5 games + 1 on the way <span>↗</span></span></div><div class="game-grid">
+        <button class="game-card" data-game="memory"><div class="card-art memory-art" aria-hidden="true"><span class="card-tag">BRAIN BOOST</span><div class="memory-illustration"><span>✿</span><span>?</span><span>✿</span></div><span class="art-decoration">✳</span></div><div class="card-body"><div class="card-title"><h3>Memory Match</h3><span class="play-arrow">↗</span></div><p>A little focus. A very satisfying match.</p><div class="card-meta"><span>◉ 1 player</span><span>Mindful moments</span></div></div></button>
+        <button class="game-card" data-game="snake"><div class="card-art snake-art" aria-hidden="true"><span class="card-tag">ONE MORE ROUND</span><div class="card-snake"><i></i><i></i><i></i><i></i><i></i><b>··</b></div><span class="snake-apple">✦</span><span class="snake-dots">· · ·</span></div><div class="card-body"><div class="card-title"><h3>Snake</h3><span class="play-arrow">↗</span></div><p>Eat. Grow. Try not to eat yourself.</p><div class="card-meta"><span>◉ 1 player</span><span>Arcade energy</span></div></div></button>
+
+        <button class="game-card" data-game="uno"><div class="card-art uno-art" aria-hidden="true"><span class="card-tag">COLORFUL COMPETITION</span><div class="uno-illustration"><span>7</span><span>UNO</span><span>2</span></div></div><div class="card-body"><div class="card-title"><h3>UNO</h3><span class="play-arrow">↗</span></div><p>Match a color. Play your hand. Shout UNO!</p><div class="card-meta"><span>◉ You vs computer</span><span>Card table fun</span></div></div></button>
+        <button class="game-card" data-game="set"><div class="card-art set-art" aria-hidden="true"><span class="card-tag">SPOT THE CONNECTION</span><div class="set-illustration"><span>◆</span><span>◆ ◆</span><span>◆ ◆ ◆</span></div></div><div class="card-body"><div class="card-title"><h3>Set Match</h3><span class="play-arrow">↗</span></div><p>Three cards. A pattern hiding in plain sight.</p><div class="card-meta"><span>◉ 1 player</span><span>Pattern power</span></div></div></button>
+        <button class="game-card" data-game="story"><div class="card-art story-art" aria-hidden="true"><span class="card-tag">YOU CHOOSE THE WAY</span><span class="story-illustration">☾ ✧<br>⌂ ♧</span></div><div class="card-body"><div class="card-title"><h3>The Secret Garden</h3><span class="play-arrow">↗</span></div><p>A little courage. A story only you can tell.</p><div class="card-meta"><span>◉ 1 explorer</span><span>Story adventure</span></div></div></button>
+        <div class="game-card coming-card"><div class="card-art anne-art" aria-hidden="true"><span class="card-tag">STILL DREAMING IT UP</span><span class="anne-illustration">a ✦</span></div><div class="card-body"><div class="card-title"><h3>Anne’s Game</h3><span class="coming-badge">Coming soon</span></div><p>Something special, straight from Anne’s imagination.</p><div class="card-meta"><span>The rules are an adventure for another day.</span></div></div></div>
+      </div></section>
+      <aside class="kind-note"><span>☀</span><p>A little friendly reminder: <strong>having fun is the whole point.</strong></p><span>✧</span></aside>
+    </section>
+    <section id="game-view" hidden aria-labelledby="game-title"><button id="back-button" class="back-button">← All games</button><div class="game-heading"><span class="eyebrow">LET’S PLAY</span><h1 id="game-title"></h1><p id="game-description"></p></div><div class="game-panel"><div class="game-toolbar"><p id="game-status" role="status" aria-live="polite"></p><button id="restart-button" class="small-button">↻ New game</button></div><div id="game-container"></div></div></section>
+  </main>
+  <footer><span class="footer-brand">anne’s arcade.</span><span>Made with love, for the fun of it. <span class="heart">♡</span></span><span>A little more play, every day.</span></footer>
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
