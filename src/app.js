@@ -1,3 +1,6 @@
+import {mountMemory} from './memory-game.js';
+import {mountStrategy} from './strategy-game.js';
+import {mountCoding} from './coding-game.js';
 import {mountMathGame} from './math-games.js';
 import {mountBunny} from './bunny-game.js';
 import {mountRunner} from './runner-game.js';
@@ -12,7 +15,7 @@ import {mountArcade} from './arcade-games.js';
 import {mountFrogStory} from './frog-story.js';
 import {DRAW_TWO, newAnneGame, canPlayAnne, anneMove} from './annes-game.js';
 import {isSet, findSet, makeSetDeck, makeUnoDeck, canPlayUno, unoColorAfterPlay, shuffle, storyNodes} from './more-logic.js';
-import {shuffledPairs, snakeStep} from './logic.js';
+import {snakeStep} from './logic.js';
 const home = document.querySelector('#home');
 const view = document.querySelector('#game-view');
 const container = document.querySelector('#game-container');
@@ -22,9 +25,14 @@ analytics.page('', 'Anne’s Arcade');
 let current = null;
 let cleanup = () => {};
 const games = {
+  strategy: ['Garden Four', 'Plant four in a row, block your rival, and plan a blooming victory.', startStrategy],
+  coding: ['Code Critter', 'Program Sprout with steps, turns, and loops to solve garden missions.', startCoding],
+  'math-patterns': ['Pattern Path', 'Follow repeating shapes, skip-counts, and growing number trails.', startMathPatterns],
+  'math-probability': ['Chance Pond', 'Explore chance with colorful fish, fractions, and fair picks.', startMathProbability],
+  'math-algebra': ['Mystery Number Workshop', 'Find missing numbers and keep both sides of an equation in balance.', startMathAlgebra],
   'math-garden': ['Number Garden', 'Grow your addition and subtraction skills, one sunseed at a time.', startMathGarden],
   'math-picnic': ['Sharing Picnic', 'Make equal groups, share fairly, and discover multiplication and division.', startMathPicnic],
-  'math-place': ['Place Value Builders', 'Build big numbers from little digits, from ones to hundred thousands.', startMathPlace],
+  'math-place': ['Place Value Builders', 'Build whole numbers and decimals, one place at a time.', startMathPlace],
   'math-fractions': ['Fraction Bakery', 'Decorate equal parts and explore fractions, equivalence, and comparison.', startMathFractions],
   bunny: ['Ruby’s Carrot Quest', 'A bunny-sized platform adventure with carrot-powered hops.', startBunny],
   runner: ['Desert Dino Dash', 'Tiny feet, big hops, and a desert full of surprises.', startRunner],
@@ -42,7 +50,7 @@ const games = {
   uno: ['UNO', 'A friendly two-player game against the computer.', startUno],
   set: ['Set Match', 'Find three cards: each feature must be all the same or all different.', startSet],
   story: ['The Secret Garden', 'Your choices lead the way. An original little adventure.', startStory],
-  memory: ['Memory Match', 'Turn over two cards. Find all eight pairs!', startMemory],
+  memory: ['Memory Match', 'Find picture pairs on boards from 4 × 4 to an expert 10 × 10.', startMemory],
   snake: ['Snake', 'A tiny snake with a big appetite. How far can you grow?', startSnake]
 };
 function openGame(name) {
@@ -61,27 +69,7 @@ function goHome() { if(current)analytics.page('', 'Anne’s Arcade');cleanup(); 
 document.querySelector('#back-button').addEventListener('click', () => { const previous = current; goHome(); document.querySelector(`[data-game="${previous}"]`).focus(); });
 document.querySelector('.brand').addEventListener('click', goHome);
 document.querySelector('#restart-button').addEventListener('click', () => {if (current) openGame(current);});
-function startMemory() {
-  const cards = shuffledPairs(); let selected = []; let moves = 0; let pairs = 0; let locked = false; let timeout;
-  status.textContent = '0 moves · 0 / 8 pairs';
-  const grid = document.createElement('div'); grid.className = 'memory-board';
-  cards.forEach((symbol, i) => {
-    const cell = document.createElement('button'); cell.className = 'memory-cell'; cell.textContent = '?'; cell.setAttribute('aria-label', `Card ${i + 1}, face down`);
-    cell.addEventListener('click', () => {
-      if (locked || cell.disabled || selected.some(c => c.cell === cell)) return;
-      cell.textContent = symbol; cell.classList.add('flipped'); cell.setAttribute('aria-label', `Card ${i + 1}: ${symbol}`); selected.push({symbol, cell, index:i});
-      if (selected.length < 2) return;
-      moves++;
-      if (selected[0].symbol === selected[1].symbol) {
-        selected.forEach(c => {c.cell.disabled = true; c.cell.classList.add('matched');}); selected = []; pairs++;
-      } else {
-        locked = true;
-        timeout = setTimeout(() => {selected.forEach(c => {c.cell.textContent = '?'; c.cell.classList.remove('flipped'); c.cell.setAttribute('aria-label', `Card ${c.index + 1}, face down`);}); selected = []; locked = false;}, 850);
-      }
-      status.textContent = pairs === 8 ? `All matched in ${moves} moves! Wonderful work ✨` : `${moves} moves · ${pairs} / 8 pairs`;
-    }); grid.append(cell);
-  }); container.append(grid); cleanup = () => clearTimeout(timeout);
-}
+function startMemory(){cleanup=mountMemory(container,status);}
 function startSnake() {
   const canvas = document.createElement('canvas'); canvas.width = 400; canvas.height = 400; canvas.className = 'snake-board'; canvas.setAttribute('aria-label', 'Snake game board. Use arrow keys or the direction buttons to move.'); canvas.setAttribute('role','img');
   const ctx = canvas.getContext('2d');
@@ -294,3 +282,10 @@ function startMathGarden(){cleanup=mountMathGame(container,status,'garden');}
 function startMathPicnic(){cleanup=mountMathGame(container,status,'picnic');}
 function startMathPlace(){cleanup=mountMathGame(container,status,'place');}
 function startMathFractions(){cleanup=mountMathGame(container,status,'fractions');}
+
+function startMathPatterns(){cleanup=mountMathGame(container,status,'patterns');}
+function startMathProbability(){cleanup=mountMathGame(container,status,'probability');}
+function startMathAlgebra(){cleanup=mountMathGame(container,status,'algebra');}
+
+function startStrategy(){cleanup=mountStrategy(container,status);}
+function startCoding(){cleanup=mountCoding(container,status);}

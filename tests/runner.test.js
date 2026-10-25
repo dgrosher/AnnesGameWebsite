@@ -16,10 +16,14 @@ test('ducking avoids low birds; standing is safe beneath high birds',()=>{
 });
 test('score and speed increase, obstacles spawn with spaced intervals, and offscreen ones leave',()=>{
  const s=newRunner();s.spawn=0;stepRunner(s,idle,.01,()=>0);assert.equal(s.obstacles[0].type,'cactus');assert.ok(s.spawn>=1.05);
- s.distance=10000;s.obstacles=[];s.spawn=100;stepRunner(s,idle,.03);assert.ok(s.speed>250&&s.speed<=430);assert.ok(s.score>=1000);
+ s.distance=10000;s.obstacles=[];s.spawn=100;stepRunner(s,idle,.03);assert.ok(s.speed>250&&s.speed<=720);assert.ok(s.score>=1000);
  s.obstacles=[{type:'cactus',x:-100,y:210,w:20,h:36}];stepRunner(s,idle,.03);assert.equal(s.obstacles.length,0);
 });
 test('birds arrive after the introductory stretch and game-over state stays frozen',()=>{
  const s=newRunner();s.distance=1000;s.spawn=0;stepRunner(s,idle,.01,()=>0);assert.equal(s.obstacles[0].type,'bird');assert.equal(s.obstacles[0].y,194);
  s.over=true;const before=JSON.stringify(s);stepRunner(s,{jump:true,duck:true},1);assert.equal(JSON.stringify(s),before);
+});
+test('the harder runner ramps faster, reaches a higher cap, and spawns cactus clusters',()=>{
+ const s=newRunner();s.spawn=100;s.distance=5000;stepRunner(s,idle,.01);assert.equal(s.speed,450);s.distance=20000;stepRunner(s,idle,.01);assert.equal(s.speed,720);
+ const t=newRunner();t.distance=2000;t.spawn=0;const randoms=[.99,0,0,0,0];stepRunner(t,idle,.01,()=>randoms.shift()??0);assert.equal(t.obstacles[0].type,'cactus');assert.equal(t.obstacles[0].cluster,true);assert.ok(t.obstacles[0].w>=56);assert.ok(t.spawn>=.88&&t.spawn<1.6);
 });

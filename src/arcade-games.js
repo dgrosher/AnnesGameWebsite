@@ -5,7 +5,7 @@ export function mountArcade(container,status,kind){
  const ctx=canvas.getContext('2d');const input={left:false,right:false,fire:false,up:false,down:false};const pressed=new Set();
  let running=false,started=false,disposed=false,frame,last=0,lastStatus='';
  const toggle=document.createElement('button');toggle.className='start-snake';toggle.textContent='Start game';
- const controls=document.createElement('div');controls.className='arcade-controls';controls.setAttribute('role','group');controls.setAttribute('aria-label','Touch game controls');
+ const controls=document.createElement('div');controls.className=`arcade-controls${invaders?'':' pong-controls'}`;controls.setAttribute('role','group');controls.setAttribute('aria-label','Touch game controls');
  const help=document.createElement('p');help.className='snake-help';help.textContent=invaders?'Move: ← → or A / D · Fire: Space · Hold touch buttons to move and fire.':'Move: ↑ ↓ or W / S · Or drag on the court · First to 7 wins.';
  const pauseNote=document.createElement('p');pauseNote.className='snake-help';pauseNote.textContent='P pauses or resumes. Games pause when you switch tabs.';
  function syncInput(){const maps=invaders?{left:['ArrowLeft','a','A','left'],right:['ArrowRight','d','D','right'],fire:[' ','fire']}:{up:['ArrowUp','w','W','up'],down:['ArrowDown','s','S','down']};for(const [action,keys]of Object.entries(maps))input[action]=keys.some(k=>pressed.has(k));}
