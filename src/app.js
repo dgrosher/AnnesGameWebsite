@@ -1,3 +1,4 @@
+import {mountMathGame} from './math-games.js';
 import {mountBunny} from './bunny-game.js';
 import {mountRunner} from './runner-game.js';
 import {analyticsConfig} from './analytics-config.js';
@@ -21,6 +22,10 @@ analytics.page('', 'Anne’s Arcade');
 let current = null;
 let cleanup = () => {};
 const games = {
+  'math-garden': ['Number Garden', 'Grow your addition and subtraction skills, one sunseed at a time.', startMathGarden],
+  'math-picnic': ['Sharing Picnic', 'Make equal groups, share fairly, and discover multiplication and division.', startMathPicnic],
+  'math-place': ['Place Value Builders', 'Build big numbers from little digits, from ones to hundred thousands.', startMathPlace],
+  'math-fractions': ['Fraction Bakery', 'Decorate equal parts and explore fractions, equivalence, and comparison.', startMathFractions],
   bunny: ['Ruby’s Carrot Quest', 'A bunny-sized platform adventure with carrot-powered hops.', startBunny],
   runner: ['Desert Dino Dash', 'Tiny feet, big hops, and a desert full of surprises.', startRunner],
   rally: ['Sunseed Rally', 'A garden grand prix with friendly racers and a sunny finish.', startRally],
@@ -284,3 +289,8 @@ container.addEventListener('runner-restart',()=>{if(current==='runner')openGame(
 
 function startBunny(){cleanup=mountBunny(container,status);}
 container.addEventListener('bunny-restart',()=>{if(current==='bunny')openGame(current);});
+
+function startMathGarden(){cleanup=mountMathGame(container,status,'garden');}
+function startMathPicnic(){cleanup=mountMathGame(container,status,'picnic');}
+function startMathPlace(){cleanup=mountMathGame(container,status,'place');}
+function startMathFractions(){cleanup=mountMathGame(container,status,'fractions');}

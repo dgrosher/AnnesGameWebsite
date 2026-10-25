@@ -43,6 +43,15 @@ Open port 3000 in your browser. Alternatively run `python3 -m http.server 3000` 
 
 - **Ruby’s Carrot Quest:** an original side-scrolling bunny platformer across Daisy Meadow, Apple Orchard, and Moonflower Hill. Carrots power Ruby up, improve jump height, and absorb one enemy hit. Collect sunseeds, hop onto snails from above, cross ponds, and reach each cottage. A midpoint flag saves the checkpoint for that garden. Left/Right or A/D moves; Space/Up/W jumps. Touch directions and Jump work together; P pauses. Three lives, visible garden-completion screens, and a final picnic victory.
 
+## Math corner · grades 1–4
+
+Four untimed games offer grade selection, ten-challenge rounds, visual models, optional hints, retry feedback, and a completion celebration. Wrong answers can be retried; no personal learning records are stored or sent to analytics. Grade labels describe practice levels rather than a specific school curriculum.
+
+- **Number Garden:** addition/subtraction within 20, 100, 1,000, or 10,000 by grade; includes word problems and seed counters for grade 1.
+- **Sharing Picnic:** grade 1 equal groups and fair sharing, grade 2 groups of 2/5/10, grade 3 multiplication/division facts, and grade 4 one-digit × two-digit and exact division. Basket models support repeated addition and sharing.
+- **Place Value Builders:** interactive digit boxes for tens/ones (grade 1), hundreds (grade 2), thousands (grade 3), and hundred thousands (grade 4), with expanded-form hints.
+- **Fraction Bakery:** decorate halves/quarters in grade 1, more simple fractions in grade 2, models/equivalence in grade 3, and models/equivalence/comparison in grade 4. Equal-area tray models emphasize parts of the same whole. These early-grade fraction activities are introductory enrichment.
+
 ## Test
 
 With Node.js 18 or newer, run `npm test` to check game rules. The site is static and can be deployed on any static host. Google Fonts is optional; system font fallbacks work offline. No accounts, API keys, or backend services are required to play. Optional Umami analytics needs a separately configured owner account.
