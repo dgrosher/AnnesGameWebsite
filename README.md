@@ -79,3 +79,7 @@ The integration uses Umami’s cookie-free tracking; it does not add persistent 
 ### Diagnose missing visits
 
 Umami works with GitHub Pages; it does not require a server in this repository. Open `analytics-check.html` on the live website and choose **Run analytics check**. This shows the deployed public website ID, reports Do Not Track / Global Privacy Control / Umami opt-out settings, tests the real tracking script, and observes the HTTP response for a single `analytics_check` event. It distinguishes a blocked script, a blocked collection request, a rejected website ID, and an account-disabled response. It never overrides privacy settings and never shows session/cache tokens. A successful response still needs confirmation in your own Umami Realtime dashboard. For missing accepted events, compare the displayed website ID with your selected Umami website, remove dashboard filters, and check traffic exclusions and account limits.
+
+## iOS app
+
+Anne’s Arcade also includes an iPhone and iPad app project that bundles all games for offline play. See [IOS.md](IOS.md) for Mac setup, device installation, and TestFlight/App Store instructions.

@@ -1,0 +1,11 @@
+{
+  "appId": "com.dgrosher.annesarcade",
+  "appName": "Anne’s Arcade",
+  "webDir": "dist",
+  "backgroundColor": "#f7f5ef",
+  "ios": {
+    "contentInset": "never",
+    "preferredContentMode": "mobile",
+    "backgroundColor": "#f7f5ef"
+  }
+}

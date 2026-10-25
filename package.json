@@ -3,5 +3,18 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "scripts": { "start": "python3 -m http.server 3000 --bind 0.0.0.0", "test": "node --test" }
+  "scripts": {
+    "start": "python3 -m http.server 3000 --bind 0.0.0.0",
+    "test": "node --test",
+    "build:ios": "node scripts/build-ios-web.mjs",
+    "ios:sync": "npm run build:ios && cap sync ios",
+    "ios:open": "cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/ios": "^8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.3"
+  }
 }
