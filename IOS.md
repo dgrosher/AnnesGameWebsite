@@ -7,6 +7,8 @@ The Capacitor app bundles all 27 games, artwork, and game code locally. It works
 Requirements: Node.js 22 or newer, Xcode 26 or newer with its iOS SDK installed, and an iOS 15+ simulator or device. Xcode downloads the pinned Capacitor Swift package on the first build, so development setup needs internet access.
 
 ```sh
+git clone --branch gh-pages https://github.com/dgrosher/AnnesGameWebsite.git
+cd AnnesGameWebsite
 npm ci
 npm run ios:sync
 npm run ios:open
