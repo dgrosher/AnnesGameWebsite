@@ -83,3 +83,5 @@ Umami works with GitHub Pages; it does not require a server in this repository. 
 ## iOS app
 
 Anne’s Arcade also includes an iPhone and iPad app project that bundles all games for offline play. See [IOS.md](IOS.md) for Mac setup, device installation, and TestFlight/App Store instructions.
+
+To build and release entirely in the cloud, use [the GitHub Actions and TestFlight setup guide](IOS-RELEASE.md).

@@ -1,0 +1,134 @@
+name: iOS build and TestFlight
+
+on:
+  push:
+    branches: [gh-pages]
+    paths:
+      - '.github/workflows/ios.yml'
+      - 'ios/**'
+      - 'scripts/**'
+      - 'src/**'
+      - 'assets/**'
+      - 'tests/**'
+      - 'index.html'
+      - 'style.css'
+      - 'privacy-ios.html'
+      - 'capacitor.config.json'
+      - 'package*.json'
+  workflow_dispatch:
+    inputs:
+      destination:
+        description: What should GitHub build?
+        type: choice
+        options: [simulator, testflight]
+        default: simulator
+      version:
+        description: 'App Store version, for example 1.0.0'
+        default: '1.0.0'
+        required: true
+      build_number:
+        description: 'Optional build number; otherwise GitHub run number.attempt (must increase for each upload)'
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-${{ github.workflow }}-${{ github.event_name }}-${{ inputs.destination || 'simulator' }}
+  cancel-in-progress: false
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      source_sha: ${{ steps.source.outputs.sha }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && 'gh-pages' || github.sha }}
+      - id: source
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+  simulator:
+    if: github.event_name != 'workflow_dispatch' || inputs.destination == 'simulator'
+    needs: tests
+    runs-on: macos-15
+    timeout-minutes: 35
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.tests.outputs.source_sha }}
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run ios:sync
+      - name: Build unsigned simulator app
+        run: |
+          xcodebuild -version
+          xcodebuild -project ios/App/App.xcodeproj -scheme App \
+            -configuration Debug -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/ios-build" CODE_SIGNING_ALLOWED=NO build
+          ditto -c -k --keepParent "$RUNNER_TEMP/ios-build/Build/Products/Debug-iphonesimulator/App.app" "$RUNNER_TEMP/AnnesArcade-simulator.zip"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AnnesArcade-simulator
+          path: ${{ runner.temp }}/AnnesArcade-simulator.zip
+          retention-days: 7
+          if-no-files-found: error
+
+  testflight:
+    if: github.event_name == 'workflow_dispatch' && inputs.destination == 'testflight'
+    needs: tests
+    runs-on: macos-15
+    environment: app-store
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.tests.outputs.source_sha }}
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run ios:sync
+      - name: Import distribution signing credentials
+        env:
+          IOS_DISTRIBUTION_P12_BASE64: ${{ secrets.IOS_DISTRIBUTION_P12_BASE64 }}
+          IOS_DISTRIBUTION_P12_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_P12_PASSWORD }}
+          IOS_PROVISION_PROFILE_BASE64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: bash scripts/ios/import-signing.sh
+      - name: Archive and export signed app
+        env:
+          APP_VERSION: ${{ inputs.version }}
+          BUILD_NUMBER: ${{ inputs.build_number || format('{0}.{1}', github.run_number, github.run_attempt) }}
+        run: bash scripts/ios/archive.sh
+      - name: Upload to App Store Connect for TestFlight
+        env:
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+        run: bash scripts/ios/upload.sh
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AnnesArcade-signed-${{ github.run_number }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/ios-export/*.ipa
+          retention-days: 7
+          if-no-files-found: error
+      - name: Remove temporary signing material
+        if: always()
+        run: bash scripts/ios/cleanup.sh

@@ -7,3 +7,10 @@ ios/App/CapApp-SPM/.build/
 ios/App/CapApp-SPM/Package.resolved
 **/xcuserdata/
 **/DerivedData/
+*.p12
+*.p8
+*.mobileprovision
+*.certSigningRequest
+*-private-key.pem
+*.base64
+__pycache__/

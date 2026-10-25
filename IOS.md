@@ -20,6 +20,8 @@ For your own iPhone, select the App target’s **Signing & Capabilities**, choos
 
 ## Distribution
 
+For cloud builds without a Mac, follow [the GitHub Actions, TestFlight, and App Store release guide](IOS-RELEASE.md). It includes the exact GitHub Secrets, browser-based Apple setup, and signing-file generation using a Codespace.
+
 For TestFlight or App Store distribution, use an Apple Developer Program membership. Set your own team, bundle identifier, version and build number in Xcode, select **Any iOS Device**, and use **Product → Archive → Distribute App → App Store Connect**. Create the matching app record in App Store Connect and provide screenshots, description, support URL, privacy policy and age rating. Each update requires a new native build; GitHub Pages deployments do not update installed apps.
 
 The included app icon and launch artwork are original arcade branding. Review game names, artwork rights, App Store metadata, and Apple’s requirements before submitting. This repository does not contain signing credentials or an uploaded App Store build.
