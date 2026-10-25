@@ -2,7 +2,7 @@ name: iOS build and TestFlight
 
 on:
   push:
-    branches: [gh-pages]
+    branches: [main]
     paths:
       - '.github/workflows/ios.yml'
       - 'ios/**'
@@ -15,6 +15,8 @@ on:
       - 'privacy-ios.html'
       - 'capacitor.config.json'
       - 'package*.json'
+  pull_request:
+    branches: [main]
   workflow_dispatch:
     inputs:
       destination:
@@ -46,7 +48,7 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && 'gh-pages' || github.sha }}
+          ref: ${{ github.sha }}
       - id: source
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4

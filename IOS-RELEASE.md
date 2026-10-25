@@ -2,28 +2,25 @@
 
 No personal Mac is required. GitHub’s macOS runner compiles and signs the app. You use Apple’s and GitHub’s websites, and optionally a GitHub Codespace terminal to generate signing files.
 
-The app source and workflow are on **gh-pages**, while the repository’s default branch is **main**. The workflow builds a tested, fixed commit from gh-pages. It runs an unsigned simulator build after relevant pushes, and uploads a signed build **only when you manually select testflight**. It never submits a public App Store release automatically.
+The app source and workflow are maintained together on **main** after merging the full arcade pull request. The workflow builds the exact selected commit, tests it, and reuses that same commit for the native build. It runs an unsigned simulator build for pull requests into main and relevant pushes to main, and uploads a signed build **only when you manually select testflight**. It never submits a public App Store release automatically.
 
-## 1. Enable the workflow’s Run workflow button (one time)
+## 1. Merge the arcade updates and run the first cloud build
 
-GitHub requires a manually dispatched workflow to exist on the repository’s **default branch**. This repository currently defaults to main; the full arcade is on gh-pages.
-
-1. Open [the workflow on gh-pages](https://github.com/dgrosher/AnnesGameWebsite/blob/gh-pages/.github/workflows/ios.yml) and copy its raw contents.
-2. Open [the repository on main](https://github.com/dgrosher/AnnesGameWebsite/tree/main). Choose **Add file → Create new file**.
-3. Name it `.github/workflows/ios.yml`, paste the exact workflow contents, and commit it to main (or open and merge a pull request if main is protected). This adds only the workflow to main; you do not need to replace main with the whole arcade.
-4. Open **Actions → iOS build and TestFlight → Run workflow**. Leave branch **main** selected and destination **simulator**. Run it.
-5. Both **tests** and **simulator** should turn green. Download the `AnnesArcade-simulator` artifact if desired. This is for an Apple simulator, not installation on an iPhone. No Apple account or secrets are required for this check.
+1. Review and merge the full Anne’s Arcade pull request into **main**. This brings all games, the iOS project, and the workflow onto the default branch together. No workflow files need to be copied manually.
+2. Open **Actions → iOS build and TestFlight**. Merging triggers an unsigned simulator build. Alternatively choose **Run workflow**, leave branch **main** selected and destination **simulator**, then run it.
+3. Both **tests** and **simulator** should turn green. Download the `AnnesArcade-simulator` artifact if desired. This is for an Apple simulator, not installation on an iPhone. No Apple account or secrets are required for this check. GitHub may require a maintainer to approve the first workflow run from a pull request.
+4. For future website updates to publish from main too, open **Settings → Pages → Build and deployment → Deploy from a branch**, choose **main** and **/ (root)**, and save. Until you change this setting, the existing site continues to publish from gh-pages. Changing the source keeps the same public website address.
 
 If Actions is disabled, enable it under repository **Settings → Actions → General**. Public-repository standard hosted runners are generally free; private repositories have plan-dependent included minutes and macOS usage costs. Check your account’s Actions billing before running many builds.
 
-Keep the copy on main updated if you later change `.github/workflows/ios.yml` on gh-pages. The workflow explicitly selects Xcode 26.3 on macos-15; update `DEVELOPER_DIR` in both jobs if GitHub retires that installation.
+Keep future changes in pull requests into main, including workflow changes. The workflow explicitly selects Xcode 26.3 on macos-15; update `DEVELOPER_DIR` in both jobs if GitHub retires that installation.
 
 ## 2. Enroll with Apple and create the app identity
 
 1. Enroll in the [Apple Developer Program](https://developer.apple.com/programs/enroll/). This is a paid membership; check Apple’s current local price. Accept any agreements Apple requests.
 2. In [Apple Developer → Membership details](https://developer.apple.com/account), find your **Team ID**, a 10-character identifier. Save it for GitHub Secrets.
 3. Open **Certificates, Identifiers & Profiles → Identifiers → + → App IDs → App**.
-4. Description: `Anne's Arcade`. Use the **explicit** Bundle ID `com.dgrosher.annesarcade`. No extra capabilities are needed. Register it. If that ID is unavailable, choose your own ID, update `appId` in `capacitor.config.json` and both `PRODUCT_BUNDLE_IDENTIFIER` entries in the Xcode project on gh-pages, then use that ID everywhere below.
+4. Description: `Anne's Arcade`. Use the **explicit** Bundle ID `com.dgrosher.annesarcade`. No extra capabilities are needed. Register it. If that ID is unavailable, choose your own ID, update `appId` in `capacitor.config.json` and both `PRODUCT_BUNDLE_IDENTIFIER` entries in the Xcode project on main, then use that ID everywhere below.
 5. Open [App Store Connect](https://appstoreconnect.apple.com/) → **My Apps → + → New App**. Select iOS, your language, your app name (subject to availability), and that Bundle ID. Choose an internal SKU such as `annes-arcade-ios-001`. Create the app. A different SKU does not change the bundle ID.
 
 An Account Holder/Admin may need to perform these steps or grant appropriate access. Resolve pending agreements in App Store Connect if uploads are blocked.
@@ -111,7 +108,7 @@ gh secret set IOS_PROVISION_PROFILE_BASE64 --env app-store \
   --repo dgrosher/AnnesGameWebsite < profile.base64
 ```
 
-If you configure environment deployment-branch restrictions, allow **main**, because manual runs start from main even though they check out arcade source from gh-pages. Required reviewers are optional. Once secrets are installed and securely backed up, delete the Codespace containing signing files. Do not upload signing files as GitHub artifacts. The workflow removes temporary credentials from its disposable runner after each release job.
+If you configure environment deployment-branch restrictions, allow **main**, so release runs can use the main branch. Required reviewers are optional. Once secrets are installed and securely backed up, delete the Codespace containing signing files. Do not upload signing files as GitHub artifacts. The workflow removes temporary credentials from its disposable runner after each release job.
 
 ## 7. Build and upload to TestFlight
 
@@ -142,11 +139,11 @@ In App Store Connect:
 9. Review game names and artwork rights before a public submission. Current titles include **UNO** and **Space Invaders**; use branding you have rights to use or rename/redesign those titles appropriately. The other original adaptations should also be reviewed for rights. Apple may request additional changes or native functionality during review.
 10. Choose **manual release** if you want control over when an approved app becomes public. Add the version for review and submit it. Apple review and approval remain separate from TestFlight upload.
 
-For future updates: change shared game code on gh-pages, verify the simulator workflow, manually upload a higher build number, test in TestFlight, then submit a new App Store version when ready. Installed apps receive changes through Apple’s distribution process; website deployments alone do not update them.
+For future updates: merge shared game code changes into main, verify the simulator workflow, manually upload a higher build number, test in TestFlight, then submit a new App Store version when ready. Installed apps receive changes through Apple’s distribution process; website deployments alone do not update them.
 
 ## Troubleshooting
 
-- **No Run workflow button:** copy the workflow onto main as described in step 1 and confirm Actions is enabled.
+- **No Run workflow button:** merge the full arcade pull request into main as described in step 1 and confirm Actions is enabled.
 - **Missing secret:** add it to environment `app-store`, not to a different environment.
 - **Certificate/profile mismatch:** regenerate the profile with the same certificate whose private key is in the P12. A newly downloaded `.cer` does not recreate a lost key.
 - **P12 import password error:** use the export password, not your Apple password or the earlier PEM key password.
@@ -154,4 +151,4 @@ For future updates: change shared game code on gh-pages, verify the simulator wo
 - **Bundle identifier not found / upload forbidden:** check that the app record, registered App ID, profile, API key’s team and configured bundle ID all refer to the same app/team.
 - **Build number already used:** start a new run or explicitly enter a higher build number.
 - **Key/API authorization error:** use the team Key ID and Issuer ID, verify App Manager access and the complete unmodified `.p8` text, and check pending Apple agreements.
-- **Xcode installation missing:** consult GitHub’s macos-15 runner image software list and update `DEVELOPER_DIR` in both workflow copies to a supported Xcode 26+ installation.
+- **Xcode installation missing:** consult GitHub’s macos-15 runner image software list and update `DEVELOPER_DIR` in the workflow to a supported Xcode 26+ installation.
